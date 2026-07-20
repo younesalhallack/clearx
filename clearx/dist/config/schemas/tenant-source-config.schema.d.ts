@@ -32,6 +32,8 @@ export declare class TenantSourceConfig {
     fileFormat: FileFormat;
     fieldMapping: Record<string, FieldMappingRule>;
     validationRules: ValidationRules;
+    columnSignature?: string;
+    confirmed: boolean;
 }
 export declare const TenantSourceConfigSchema: import("mongoose").Schema<TenantSourceConfig, import("mongoose").Model<TenantSourceConfig, any, any, any, Document<unknown, any, TenantSourceConfig, any, {}> & TenantSourceConfig & {
     _id: import("mongoose").Types.ObjectId;

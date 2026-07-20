@@ -14,7 +14,6 @@ import { FieldTransformerService } from './field-transformer.service';
 import { MatchKeyResolverService } from './match-key-resolver.service';
 import { TenantSourceConfig } from '../../config/schemas/tenant-source-config.schema';
 
-
 export interface NormalizationSummary {
   totalRecords: number;
   savedRecords: number;

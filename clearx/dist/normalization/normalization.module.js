@@ -15,6 +15,7 @@ const config_module_1 = require("../config/config.module");
 const file_parser_service_1 = require("./services/file-parser.service");
 const field_transformer_service_1 = require("./services/field-transformer.service");
 const match_key_resolver_service_1 = require("./services/match-key-resolver.service");
+const schema_detection_service_1 = require("./services/schema-detection.service");
 const normalization_service_1 = require("./services/normalization.service");
 const normalization_controller_1 = require("./normalization.controller");
 let NormalizationModule = class NormalizationModule {
@@ -32,6 +33,7 @@ exports.NormalizationModule = NormalizationModule = __decorate([
             file_parser_service_1.FileParserService,
             field_transformer_service_1.FieldTransformerService,
             match_key_resolver_service_1.MatchKeyResolverService,
+            schema_detection_service_1.SchemaDetectionService,
             normalization_service_1.NormalizationService,
         ],
         exports: [normalization_service_1.NormalizationService],

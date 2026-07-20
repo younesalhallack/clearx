@@ -6,6 +6,7 @@ import { TenantConfigModule } from '../config/config.module';
 import { FileParserService } from './services/file-parser.service';
 import { FieldTransformerService } from './services/field-transformer.service';
 import { MatchKeyResolverService } from './services/match-key-resolver.service';
+import { SchemaDetectionService } from './services/schema-detection.service';
 import { NormalizationService } from './services/normalization.service';
 import { NormalizationController } from './normalization.controller';
 
@@ -20,6 +21,7 @@ import { NormalizationController } from './normalization.controller';
     FileParserService,
     FieldTransformerService,
     MatchKeyResolverService,
+    SchemaDetectionService,
     NormalizationService,
   ],
   exports: [NormalizationService],

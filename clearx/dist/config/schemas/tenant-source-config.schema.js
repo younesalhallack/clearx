@@ -117,9 +117,18 @@ __decorate([
     (0, mongoose_1.Prop)({ type: ValidationRules, default: {} }),
     __metadata("design:type", ValidationRules)
 ], TenantSourceConfig.prototype, "validationRules", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ index: true }),
+    __metadata("design:type", String)
+], TenantSourceConfig.prototype, "columnSignature", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: true }),
+    __metadata("design:type", Boolean)
+], TenantSourceConfig.prototype, "confirmed", void 0);
 exports.TenantSourceConfig = TenantSourceConfig = __decorate([
     (0, mongoose_1.Schema)({ collection: 'tenant_source_configs', timestamps: true })
 ], TenantSourceConfig);
 exports.TenantSourceConfigSchema = mongoose_1.SchemaFactory.createForClass(TenantSourceConfig);
 exports.TenantSourceConfigSchema.index({ tenantId: 1, sourceId: 1 }, { unique: true });
+exports.TenantSourceConfigSchema.index({ tenantId: 1, columnSignature: 1 });
 //# sourceMappingURL=tenant-source-config.schema.js.map

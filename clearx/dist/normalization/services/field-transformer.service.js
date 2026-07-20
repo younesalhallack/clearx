@@ -74,17 +74,24 @@ let FieldTransformerService = FieldTransformerService_1 = class FieldTransformer
         }
     }
     parseDate(value, format) {
+        console.log('parseDate called with value:', value, 'type:', typeof value);
+        let numericValue = null;
+        if (typeof value === 'number') {
+            numericValue = value;
+        }
+        else if (typeof value === 'string' && !isNaN(Number(value))) {
+            numericValue = Number(value);
+        }
+        if (numericValue !== null) {
+            return new Date(Math.round((numericValue - 25569) * 86400 * 1000));
+        }
         if (value instanceof Date)
             return value;
-        if (typeof value === 'number') {
-            return new Date(Math.round((value - 25569) * 86400 * 1000));
-        }
         const str = String(value);
         const formatTokens = format.match(/YYYY|MM|DD|HH|mm|ss/g) ?? [];
         const separators = format.split(/YYYY|MM|DD|HH|mm|ss/).filter(Boolean);
-        let cursor = 0;
-        const parts = {};
         let remaining = str;
+        const parts = {};
         for (let i = 0; i < formatTokens.length; i++) {
             const token = formatTokens[i];
             const sepAfter = separators[i] ?? '';
@@ -92,7 +99,6 @@ let FieldTransformerService = FieldTransformerService_1 = class FieldTransformer
             const chunk = endIndex >= 0 ? remaining.slice(0, endIndex === token.length ? token.length : endIndex) : remaining;
             parts[token] = parseInt(chunk, 10);
             remaining = remaining.slice(chunk.length + sepAfter.length);
-            cursor += chunk.length + sepAfter.length;
         }
         const year = parts['YYYY'] ?? new Date().getFullYear();
         const month = (parts['MM'] ?? 1) - 1;

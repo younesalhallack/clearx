@@ -91,8 +91,30 @@ export class TenantSourceConfig {
 
   @Prop({ type: ValidationRules, default: {} })
   validationRules: ValidationRules;
+
+  /**
+   * Hash of this source's normalized column headers (see
+   * SchemaDetectionService#computeSignature). Lets the upload flow
+   * recognize "we've seen this exact file shape before" and reuse this
+   * config automatically without asking the tenant to reconfirm.
+   * Absent for configs created before auto-detection existed, or created
+   * manually without going through the detect/confirm flow.
+   */
+  @Prop({ index: true })
+  columnSignature?: string;
+
+  /**
+   * True once a human has explicitly reviewed and approved this mapping
+   * (via POST /normalization/confirm-and-import, or the manual creation
+   * form). The upload flow never auto-imports against an unconfirmed
+   * config.
+   */
+  @Prop({ default: true })
+  confirmed: boolean;
 }
 
 export const TenantSourceConfigSchema = SchemaFactory.createForClass(TenantSourceConfig);
 // Enforce one sourceId per tenant.
 TenantSourceConfigSchema.index({ tenantId: 1, sourceId: 1 }, { unique: true });
+// Fast lookup: "have we already confirmed a mapping for this file shape?"
+TenantSourceConfigSchema.index({ tenantId: 1, columnSignature: 1 });

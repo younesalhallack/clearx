@@ -86,16 +86,22 @@ class ApiClient {
   }
 
   /// Uploads a file (as raw bytes, which works on Flutter Web where files
-  /// don't have filesystem paths) to a multipart endpoint.
+  /// don't have filesystem paths) to a multipart endpoint. `fields` carries
+  /// any additional text form fields that should ride alongside the file
+  /// (e.g. the JSON-encoded field mapping for confirm-and-import).
   Future<dynamic> uploadFile(
     String path, {
     required List<int> bytes,
     required String filename,
     Map<String, dynamic>? query,
+    Map<String, String>? fields,
   }) async {
     final request = http.MultipartRequest('POST', _uri(path, query));
     if (_token != null) {
       request.headers['Authorization'] = 'Bearer $_token';
+    }
+    if (fields != null) {
+      request.fields.addAll(fields);
     }
     request.files.add(
       http.MultipartFile.fromBytes('file', bytes, filename: filename),

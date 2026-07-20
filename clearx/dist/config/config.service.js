@@ -31,10 +31,32 @@ let TenantConfigService = class TenantConfigService {
         if (existing) {
             throw new common_1.ConflictException(`A source config with sourceId "${dto.sourceId}" already exists for this tenant`);
         }
-        const created = await this.sourceConfigModel.create({ ...dto, tenantId });
+        const created = await this.sourceConfigModel.create({ ...dto, tenantId, confirmed: true });
         await this.recordAudit(tenantId, 'SOURCE_CONFIG_CREATED', 'TenantSourceConfig', dto.sourceId, {
             sourceName: dto.sourceName,
         });
+        return created.toObject();
+    }
+    async saveConfirmedSourceConfig(tenantId, dto) {
+        const existing = await this.sourceConfigModel.findOne({
+            tenantId,
+            sourceId: dto.sourceId,
+        });
+        if (existing) {
+            throw new common_1.ConflictException(`A source config with sourceId "${dto.sourceId}" already exists for this tenant`);
+        }
+        const created = await this.sourceConfigModel.create({
+            tenantId,
+            sourceId: dto.sourceId,
+            sourceName: dto.sourceName,
+            paymentMethod: dto.paymentMethod,
+            fileFormat: dto.fileFormat,
+            fieldMapping: dto.fieldMapping,
+            validationRules: dto.validationRules,
+            columnSignature: dto.columnSignature,
+            confirmed: true,
+        });
+        await this.recordAudit(tenantId, 'SOURCE_CONFIG_CONFIRMED_FROM_DETECTION', 'TenantSourceConfig', dto.sourceId, { sourceName: dto.sourceName, columnSignature: dto.columnSignature });
         return created.toObject();
     }
     async findAllSourceConfigs(tenantId) {
@@ -46,6 +68,12 @@ let TenantConfigService = class TenantConfigService {
             throw new common_1.NotFoundException(`Source config "${sourceId}" not found for tenant`);
         }
         return config;
+    }
+    async findByColumnSignature(tenantId, columnSignature) {
+        return this.sourceConfigModel
+            .findOne({ tenantId, columnSignature, confirmed: true })
+            .lean()
+            .exec();
     }
     async recordAudit(tenantId, action, entity, entityId, details = {}) {
         await this.auditLogModel.create({

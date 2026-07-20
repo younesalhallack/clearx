@@ -104,39 +104,87 @@ export class FieldTransformerService {
    * token. For production use, consider swapping in a robust library
    * (e.g. date-fns / dayjs with custom-parse-format) behind this method.
    */
+  // private parseDate(value: any, format: string): Date {
+  //   if (value instanceof Date) return value;
+
+  //   if (typeof value === 'number') {
+  //     // Excel serial date fallback.
+  //     return new Date(Math.round((value - 25569) * 86400 * 1000));
+  //   }
+
+  //   const str = String(value);
+  //   const formatTokens = format.match(/YYYY|MM|DD|HH|mm|ss/g) ?? [];
+  //   const separators = format.split(/YYYY|MM|DD|HH|mm|ss/).filter(Boolean);
+
+  //   let cursor = 0;
+  //   const parts: Record<string, number> = {};
+  //   let remaining = str;
+
+  //   for (let i = 0; i < formatTokens.length; i++) {
+  //     const token = formatTokens[i];
+  //     const sepAfter = separators[i] ?? '';
+  //     const endIndex = sepAfter ? remaining.indexOf(sepAfter) : token.length;
+  //     const chunk = endIndex >= 0 ? remaining.slice(0, endIndex === token.length ? token.length : endIndex) : remaining;
+  //     parts[token] = parseInt(chunk, 10);
+  //     remaining = remaining.slice(chunk.length + sepAfter.length);
+  //     cursor += chunk.length + sepAfter.length;
+  //   }
+
+  //   const year = parts['YYYY'] ?? new Date().getFullYear();
+  //   const month = (parts['MM'] ?? 1) - 1;
+  //   const day = parts['DD'] ?? 1;
+  //   const hours = parts['HH'] ?? 0;
+  //   const minutes = parts['mm'] ?? 0;
+  //   const seconds = parts['ss'] ?? 0;
+
+  //   return new Date(year, month, day, hours, minutes, seconds);
+  // }
   private parseDate(value: any, format: string): Date {
-    if (value instanceof Date) return value;
 
-    if (typeof value === 'number') {
-      // Excel serial date fallback.
-      return new Date(Math.round((value - 25569) * 86400 * 1000));
-    }
+    console.log('parseDate called with value:', value, 'type:', typeof value);
 
-    const str = String(value);
-    const formatTokens = format.match(/YYYY|MM|DD|HH|mm|ss/g) ?? [];
-    const separators = format.split(/YYYY|MM|DD|HH|mm|ss/).filter(Boolean);
-
-    let cursor = 0;
-    const parts: Record<string, number> = {};
-    let remaining = str;
-
-    for (let i = 0; i < formatTokens.length; i++) {
-      const token = formatTokens[i];
-      const sepAfter = separators[i] ?? '';
-      const endIndex = sepAfter ? remaining.indexOf(sepAfter) : token.length;
-      const chunk = endIndex >= 0 ? remaining.slice(0, endIndex === token.length ? token.length : endIndex) : remaining;
-      parts[token] = parseInt(chunk, 10);
-      remaining = remaining.slice(chunk.length + sepAfter.length);
-      cursor += chunk.length + sepAfter.length;
-    }
-
-    const year = parts['YYYY'] ?? new Date().getFullYear();
-    const month = (parts['MM'] ?? 1) - 1;
-    const day = parts['DD'] ?? 1;
-    const hours = parts['HH'] ?? 0;
-    const minutes = parts['mm'] ?? 0;
-    const seconds = parts['ss'] ?? 0;
-
-    return new Date(year, month, day, hours, minutes, seconds);
+  // 1️⃣ التعامل مع الأرقام (صحيحة أو عشرية) كتاريخ Excel تسلسلي
+  let numericValue: number | null = null;
+  if (typeof value === 'number') {
+    numericValue = value;
+  } else if (typeof value === 'string' && !isNaN(Number(value))) {
+    numericValue = Number(value);
   }
+
+  if (numericValue !== null) {
+    // تحويل تاريخ Excel التسلسلي (مع الوقت) إلى كائن Date
+    // 25569 = الفرق بين 1900-01-01 و 1970-01-01 بالأيام
+    // 86400 = عدد الثواني في اليوم
+    return new Date(Math.round((numericValue - 25569) * 86400 * 1000));
+  }
+
+  // 2️⃣ إذا كانت القيمة من نوع Date بالفعل
+  if (value instanceof Date) return value;
+
+  // 3️⃣ التعامل مع التواريخ النصية بالتنسيق المحدد (كما في الكود الأصلي)
+  const str = String(value);
+  const formatTokens = format.match(/YYYY|MM|DD|HH|mm|ss/g) ?? [];
+  const separators = format.split(/YYYY|MM|DD|HH|mm|ss/).filter(Boolean);
+
+  let remaining = str;
+  const parts: Record<string, number> = {};
+
+  for (let i = 0; i < formatTokens.length; i++) {
+    const token = formatTokens[i];
+    const sepAfter = separators[i] ?? '';
+    const endIndex = sepAfter ? remaining.indexOf(sepAfter) : token.length;
+    const chunk = endIndex >= 0 ? remaining.slice(0, endIndex === token.length ? token.length : endIndex) : remaining;
+    parts[token] = parseInt(chunk, 10);
+    remaining = remaining.slice(chunk.length + sepAfter.length);
+  }
+
+  const year = parts['YYYY'] ?? new Date().getFullYear();
+  const month = (parts['MM'] ?? 1) - 1;
+  const day = parts['DD'] ?? 1;
+  const hours = parts['HH'] ?? 0;
+  const minutes = parts['mm'] ?? 0;
+  const seconds = parts['ss'] ?? 0;
+
+  return new Date(year, month, day, hours, minutes, seconds);
+}
 }
