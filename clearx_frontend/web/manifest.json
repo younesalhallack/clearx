@@ -1,0 +1,12 @@
+{
+    "name": "ClearX",
+    "short_name": "ClearX",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0E1116",
+    "theme_color": "#1C6E5C",
+    "description": "Reconciliation and settlement platform",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": []
+}

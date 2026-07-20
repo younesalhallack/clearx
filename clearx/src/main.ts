@@ -6,6 +6,14 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Allow the Flutter Web frontend (served from a different origin, e.g.
+  // http://localhost:5000 or http://localhost:8080) to call this API.
+  // Tighten `origin` to your actual deployed frontend URL in production.
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
